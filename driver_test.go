@@ -8,7 +8,7 @@ import (
 
 	"sync"
 
-	"github.com/johnnadratowski/golang-neo4j-bolt-driver/log"
+	"github.com/ONSdigital/golang-neo4j-bolt-driver/log"
 )
 
 var (
@@ -362,7 +362,7 @@ func TestBoltDriverPool_ClosePool(t *testing.T) {
 	}
 
 	err = driver.Close()
-	if(err != nil) {
+	if err != nil {
 		t.Fatalf("An error occurred creating trying to close the driver pool: %s", err)
 	}
 }

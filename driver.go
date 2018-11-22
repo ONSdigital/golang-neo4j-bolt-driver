@@ -1,12 +1,13 @@
 package golangNeo4jBoltDriver
 
 import (
-	"github.com/johnnadratowski/golang-neo4j-bolt-driver/log"
-	"time"
 	"database/sql"
 	"database/sql/driver"
-	"github.com/johnnadratowski/golang-neo4j-bolt-driver/errors"
 	"sync"
+	"time"
+
+	"github.com/ONSdigital/golang-neo4j-bolt-driver/errors"
+	"github.com/ONSdigital/golang-neo4j-bolt-driver/log"
 )
 
 var (
@@ -140,15 +141,15 @@ func (d *boltDriverPool) OpenPool() (Conn, error) {
 	return nil, errors.New("Driver pool has been closed")
 }
 
-func connectionNilOrClosed(conn *boltConn) (bool) {
-	if(conn.conn == nil) {//nil check before attempting read
+func connectionNilOrClosed(conn *boltConn) bool {
+	if conn.conn == nil { //nil check before attempting read
 		return true
 	}
 	conn.conn.SetReadDeadline(time.Now())
-	zero := make ([]byte, 0)
-	_, err := conn.conn.Read(zero)//read zero bytes to validate connection is still alive
+	zero := make([]byte, 0)
+	_, err := conn.conn.Read(zero) //read zero bytes to validate connection is still alive
 	if err != nil {
-		log.Error("Bad Connection state detected", err)//the error caught here could be a io.EOF or a timeout, either way we want to log the error & return true
+		log.Error("Bad Connection state detected", err) //the error caught here could be a io.EOF or a timeout, either way we want to log the error & return true
 		return true
 	}
 	return false
