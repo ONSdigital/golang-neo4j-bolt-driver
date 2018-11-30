@@ -95,15 +95,20 @@ type boltDriverPool struct {
 
 // NewDriverPool creates a new Driver object with connection pooling
 func NewDriverPool(connStr string, max int) (DriverPool, error) {
-	return createDriverPool(connStr, max)
+	return createDriverPool(connStr, max, 0)
 }
 
 // NewClosableDriverPool create a closable driver pool
 func NewClosableDriverPool(connStr string, max int) (ClosableDriverPool, error) {
-	return createDriverPool(connStr, max)
+	return createDriverPool(connStr, max, 0)
 }
 
-func createDriverPool(connStr string, max int) (*boltDriverPool, error) {
+// NewClosableDriverPoolWithTimeout create a closable driver pool
+func NewClosableDriverPoolWithTimeout(connStr string, max int, timeout int) (ClosableDriverPool, error) {
+	return createDriverPool(connStr, max, timeout)
+}
+
+func createDriverPool(connStr string, max int, timeout int) (*boltDriverPool, error) {
 	d := &boltDriverPool{
 		connStr:  connStr,
 		maxConns: max,
@@ -114,6 +119,10 @@ func createDriverPool(connStr string, max int) (*boltDriverPool, error) {
 		conn, err := newPooledBoltConn(connStr, d)
 		if err != nil {
 			return nil, err
+		}
+
+		if timeout > 0 {
+			conn.SetTimeout(time.Duration(timeout) * time.Second)
 		}
 
 		d.pool <- conn
